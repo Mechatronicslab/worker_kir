@@ -1,0 +1,15 @@
+{
+    "name" : "adi permana",
+    "email" : "adi.permana60@ymail.com",
+    "password" : "090117",
+    "secret" : "kirtanggamus",
+    "database": {
+        "development": {
+            "uri": "mongodb://jancok:12345@192.168.43.244:27017/Royal"
+        },
+        "production": {
+            "uri": "mongodb://kirDB:DBkirzxc123@dbmongo.server.pptik.id:27017/kirDB"
+        }
+    }
+
+}
