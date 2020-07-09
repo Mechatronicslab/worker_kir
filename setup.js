@@ -7,7 +7,17 @@ var db = client.connection;
 const appId = "electron-windows-notifications";
 const { ToastNotification } = require("electron-windows-notifications");
 const Notification = require("node-mac-notifier");
-
+const rmq = require("amqplib");
+var knex = require("knex")({
+  client: "mysql",
+  connection: {
+    host: "192.168.18.3",
+    user: "kirtanggamus",
+    password: "",
+    database: "db_kir",
+  },
+  pool: { min: 0, max: 20 },
+});
 const options = {
   // useMongoClient: true,
   useNewUrlParser: true,
@@ -28,13 +38,56 @@ function dbConnect() {
     client.Promise = global.Promise;
     client.connect(mongodbUri, options, (err, database) => {
       if (err) {
-        console.log("Connected to mongodb server failed");
         reject(err);
       } else {
-        db = database;
-        resolve(database);
+        knex
+          .raw("SELECT 'test connection';")
+          .then((message) => {
+            console.log(message);
+            // Success / boot rest of app
+            db = database;
+            resolve(database);
+          })
+          .catch((err) => {
+            // Failure / timeout
+            console.log(err);
+            reject(err);
+          });
+        // const knex = require('knex')(mysqlDBconfig);
+        // knex.client(mysqlDBconfig)
+        // db = database;
+        // resolve(database);
       }
     });
+  });
+}
+function rmqConnect() {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let rmqConn = await rmq.connect(config["rmqUri"], function (err, conn) {
+        if (err) {
+          console.log("[AMQP]", err.message);
+          return setTimeout(rmqConnect, 5000);
+        }
+        conn.on("error", function (err) {
+          if (err.message !== "Connection closing") {
+            console.error("[AMQP] conn error", err.message);
+            return setTimeout(rmqConnect, 5000);
+          }
+        });
+        conn.on("close", function () {
+          console.error("[AMQP] reconnecting");
+          return setTimeout(rmqConnect, 1000);
+        });
+      });
+      resolve(rmqConn);
+    } catch (error) {
+      console.log("failed connect to rmq ");
+      console.log("try to connect RMQ in 5 sec ..");
+      setTimeout(function () {
+        rmqConnect();
+      }, 5000);
+    }
   });
 }
 
@@ -254,4 +307,10 @@ const requestResponse = {
   },
 };
 
-module.exports = { requestResponse, mongodbUri, dbConnect, listendata };
+module.exports = {
+  requestResponse,
+  mongodbUri,
+  dbConnect,
+  listendata,
+  rmqConnect,
+};
