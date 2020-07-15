@@ -43,40 +43,41 @@ async function onListening() {
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   setUp
     .dbConnect()
-    .then(async (db) => {
-      app.database = db;
+    .then(async (dbMysql) => {
+      app.database = dbMysql;
       console.log("mongodb connected");
       await setUp
-        .rmqConnect().then(async (rmq) => {
+        .rmqConnect()
+        .then(async (rmq) => {
           console.log("RMQ connected");
-          let channel = await rmq.createChannel()
-            try {
-              await channel.consume("subscribe", async (msg) => {
-                console.log("=================================================");
-                let data = JSON.parse(msg.content.toString());
-                // console.log(msg.content.toString())
-                let pengujian = data.pengujian;
-                let kendaraan = data.kendaraan;
-                decodeImg(pengujian.fotodepansmallfile, pengujian.fotodepansmall);
-                decodeImg(
-                  pengujian.fotobelakangsmallfile,
-                  pengujian.fotobelakangsmall
-                );
-                decodeImg(pengujian.fotokirismallfile, pengujian.fotokirismall);
-                decodeImg(pengujian.fotokanansmallfile, pengujian.fotokanansmall);
-               
-                delete pengujian.fotodepansmallfile;
-                delete pengujian.fotobelakangsmallfile;
-                delete pengujian.fotokirismallfile;
-                delete pengujian.fotokanansmallfile;
-               
-                console.log(data);
-                await createData(data);
-                channel.ack(msg);
-                
-              });
-            }catch (err) {
-            console.log(err)
+          let channel = await rmq.createChannel();
+          try {
+            await channel.consume("subscribe", async (msg) => {
+              console.log("=================================================");
+              let data = JSON.parse(msg.content.toString());
+              // console.log(msg.content.toString())
+              let pengujian = data.pengujian;
+              let kendaraan = data.kendaraan;
+              decodeImg(pengujian.fotodepansmallfile, pengujian.fotodepansmall);
+              decodeImg(
+                pengujian.fotobelakangsmallfile,
+                pengujian.fotobelakangsmall
+              );
+              decodeImg(pengujian.fotokirismallfile, pengujian.fotokirismall);
+              decodeImg(pengujian.fotokanansmallfile, pengujian.fotokanansmall);
+
+              delete pengujian.fotodepansmallfile;
+              delete pengujian.fotobelakangsmallfile;
+              delete pengujian.fotokirismallfile;
+              delete pengujian.fotokanansmallfile;
+
+              console.log(data);
+              channel.ack(msg);
+              await createData(data);
+              
+            });
+          } catch (err) {
+            console.log(err);
           }
         })
         .catch((err) => {
@@ -105,19 +106,65 @@ function decodeImg(img, filename) {
 createData = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      await RawKir.create(data);
-     
+      await RawKir.create(data)
+        .then((result) => {
+          console.log("insert Data Raw Success");
+        })
+        .catch((err) => {
+          console.log("gagal input data raw :" + err);
+        });
+
       let datapengujian = Object.assign(data.pengujian, {
         nouji: data.kendaraan.nouji,
         nomesin: data.kendaraan.nomesin,
       });
       // console.log(datapengujian)
-      await Pengujian.create(datapengujian);
-      await Kendaraan.create(data.kendaraan);
+      await Pengujian.create(datapengujian)
+        .then((result) => {
+          console.log("insert Data Pengujian Success");
+        })
+        .catch((err) => {
+          console.log("gagal input data pengujian :" + err);
+        });
+      await Kendaraan.update(data.kendaraan, { upsert: true })
+        .then((result) => {
+          console.log("insert Data Kendaraan Success");
+        })
+        .catch((err) => {
+          console.log("gagal input data kendaraan :" + err);
+        });
+      await storeMysql(data);
       resolve(true);
     } catch (error) {
-      console.log("error insert history");
+      console.log("error insert history" + error);
       reject(error);
     }
+  });
+};
+
+storeMysql = (data) => {
+  return new Promise(async (resolve, reject) => {
+    let value = Object.assign(data.pengujian, data.kendaraan);
+    value.tglsertifikatreg = value.tglsertifikatreg.replace("-", "");
+    value.tgluji = value.tgluji.replace("-", "");
+    console.log(value.tgluji)
+    // value.tglsertifikatreg = 20200713;
+    // value.tgluji = 20200713;
+    delete value.bahankaroseri;
+    delete value.banyaktempatberdiri;
+    delete value.banyaktempatduduk;
+    delete value.jeniskaroseri;
+    delete value.warnatnbk;
+    // console.log(value);
+    app.database("datapengujian")
+      .insert(value)
+      .then((message) => {
+        console.log("mysql  tester knex connected");
+        resolve(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        reject(err);
+      });
   });
 };

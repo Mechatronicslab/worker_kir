@@ -11,8 +11,8 @@ const rmq = require("amqplib");
 var knex = require("knex")({
   client: "mysql",
   connection: {
-    host: "192.168.18.3",
-    user: "kirtanggamus",
+    host: "localhost",
+    user: "root",
     password: "",
     database: "db_kir",
   },
@@ -43,10 +43,10 @@ function dbConnect() {
         knex
           .raw("SELECT 'test connection';")
           .then((message) => {
-            console.log(message);
+            console.log("mysql connected");
             // Success / boot rest of app
             db = database;
-            resolve(database);
+            resolve(knex);
           })
           .catch((err) => {
             // Failure / timeout
