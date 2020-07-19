@@ -44,6 +44,7 @@ const kendaraan = new Schema({
   jaraksumbu1_2: String,
   jaraksumbu2_3: String,
   jaraksumbu3_4: String,
+  ukuranban: String,
   dayaangkutorang: String,
   dayaangkutbarang: String,
   kelasjalanterendah: String,
