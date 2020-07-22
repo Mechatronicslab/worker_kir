@@ -14,6 +14,7 @@ const fs = require("fs");
 const RawKir = require("./model/Raw");
 const Kendaraan = require("./model/Kendaraan");
 const Pengujian = require("./model/Pengujian");
+const dataUji = require("./model/datauji");
 app.use(bodyParser.urlencoded({
     enableTypes: [
         "json", "form"
@@ -53,7 +54,6 @@ async function onListening() {
                         await channel.consume("kir", async (msg) => {
                             console.log("=================================================");
                             let data = JSON.parse(msg.content.toString());
-                            // console.log(msg.content.toString())
                             let pengujian = data.pengujian;
                             let kendaraan = data.kendaraan;
                             decodeImg(pengujian.fotodepansmallfile, pengujian.jkj);
@@ -63,17 +63,16 @@ async function onListening() {
                             delete kendaraan._v
                             delete pengujian._id
                             delete pengujian.__v
-                            delete pengujian.fotodepansmallfile;
-                            delete pengujian.fotobelakangsmallfile;
-                            delete pengujian.fotokirismallfile;
-                            delete pengujian.fotokanansmallfile;
-                            delete pengujian.created_at;
-                            delete pengujian.no_plat;
+                            delete pengujian.fotodepansmallfile
+                            delete pengujian.fotobelakangsmallfile
+                            delete pengujian.fotokirismallfile
+                            delete pengujian.fotokanansmallfile
+                            delete pengujian.created_at
+                            delete pengujian.no_plat 
 
                             console.log(data);
-                            channel.ack(msg);
                             await createData(data);
-                            
+                            channel.ack(msg);
 
                         });
                     } catch (err) {
@@ -129,14 +128,29 @@ createData = (data) => {
                     console.log("gagal input data pengujian :" + err);
                 });
             await Kendaraan
-                .update(data.kendaraan, {upsert: true})
+                .update({nouji : data.kendaraan.nouji},data.kendaraan, {upsert: true})
                 .then((result) => {
                     console.log("insert Data Kendaraan Success");
                 })
                 .catch((err) => {
                     console.log("gagal input data kendaraan :" + err);
                 });
-            await storeMysql(data);
+            await storeMysql(data)
+                .then(async (result) => {
+                    dataUji
+                        .deleteOne({nouji: data.kendaraan.nouji})
+                        .then(async (result) => {
+                            console.log(data.kendaraan.nouji);
+                            console.log("Proses selesai")
+                        })
+                        .catch((err) => {
+                            console.log("gagal Hapus data :" + err);
+                        });
+                    
+                })
+                .catch((err) => {
+                    console.log("gagal input data kendaraan :" + err);
+                });
             resolve(true);
         } catch (error) {
             console.log("error insert history" + error);
@@ -165,7 +179,8 @@ storeMysql = (data) => {
         delete value.banyaktempatduduk;
         delete value.jeniskaroseri;
         delete value.warnatnbk;
-        console.log(value);
+        delete value.idAdministrasi
+        delete value.total
         app
             .database("datapengujian")
             .insert(value)

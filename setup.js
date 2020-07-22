@@ -11,10 +11,10 @@ const rmq = require("amqplib");
 var knex = require("knex")({
   client: "mysql",
   connection: {
-    host: "localhost",
-    user: "root",
+    host: "sql.server.pptik.id",
+    user: "kir",
     password: "",
-    database: "db_kir",
+    database: "kir",
   },
   pool: { min: 0, max: 20 },
 });
@@ -91,78 +91,6 @@ function rmqConnect() {
   });
 }
 
-function listendata() {
-  return new Promise((resolve, reject) => {
-    fs.watch("Data", function (event, filename) {
-      console.log("Data Baru Masuk= " + filename);
-      try {
-        var doc = fs.readFileSync("Data/" + filename, "utf8");
-        var data1 = toJSON(doc);
-        // console.log( JSON.stringify(data1, null, 2) + '\n')
-        DataPublish = JSON.stringify(data1, null, 1) + "\n";
-        const obj = JSON.parse(DataPublish);
-        var Fuel_Type = "Gasoline";
-
-        var CO = obj.CO;
-        // console.log(obj.Date);
-        var Date = obj.Date;
-        // console.log(filename);
-        var str = filename.slice(0, -4);
-        var No_plate = str;
-        // console.log(obj.HC);
-        var HC = obj.HC;
-        // console.log(obj.O2);
-        var O2 = obj.O2;
-        // console.log(obj.CO2);
-        var CO2 = obj.CO2;
-        // console.log(obj.Lambda);
-        var Lambda = obj.Lambda;
-        // console.log(obj.AFR);
-        var AFR = obj.AFR;
-        // console.log(obj.NOx);
-        var NOx = obj.NOx;
-        // console.log(obj.Time);
-        var Time = obj.Time;
-
-        var Json = {
-          AFR: AFR,
-          CO: CO,
-          CO2: CO2,
-          Date: Date,
-          Fuel_Type: Fuel_Type,
-          HC: HC,
-          Lambda: Lambda,
-          NOx: NOx,
-          O2: O2,
-          No_Plate: No_plate,
-          Time: Time,
-          Status: "false",
-        };
-        Simpan(Json);
-      } catch (err) {
-        console.log("file not found");
-      }
-    });
-  });
-}
-
-function Simpan(result) {
-  console.log(result);
-  db.collection("GasAnalizers").insertOne(result, function (err) {
-    if (err) {
-      console.log(requestResponse.common_error);
-    } else {
-      console.log(requestResponse.common_success);
-      // import {alert} from 'node-popup';
-      const noti = new Notification("Hello from OS X", { body: "It Works!" });
-      noti.addEventListener("click", () => console.log("Got a click."));
-
-      // process.end();
-      // process.star();
-      // close()
-    }
-  });
-}
 
 exports.commonSuccess = () => {
   const data = {
@@ -311,6 +239,5 @@ module.exports = {
   requestResponse,
   mongodbUri,
   dbConnect,
-  listendata,
   rmqConnect,
 };
