@@ -60,15 +60,13 @@ async function onListening() {
                             decodeImg(pengujian.fotobelakangsmallfile, pengujian.fotobelakangsmall);
                             decodeImg(pengujian.fotokirismallfile, pengujian.fotokirismall);
                             decodeImg(pengujian.fotokanansmallfile, pengujian.fotokanansmall);
-                            delete kendaraan._v
                             delete pengujian._id
                             delete pengujian.__v
                             delete pengujian.fotodepansmallfile
                             delete pengujian.fotobelakangsmallfile
                             delete pengujian.fotokirismallfile
                             delete pengujian.fotokanansmallfile
-                            delete pengujian.created_at
-                            delete pengujian.no_plat 
+                           
 
                             console.log(data);
                             await createData(data);
@@ -181,6 +179,12 @@ storeMysql = (data) => {
         delete value.warnatnbk;
         delete value.idAdministrasi
         delete value.total
+        delete value.__v
+        delete value._id
+        delete value.created_at
+        delete value.no_plat
+        delete value.deleted
+        console.log(value)
         app
             .database("datapengujian")
             .insert(value)
