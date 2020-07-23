@@ -1,3 +1,4 @@
 node_modules
 static
 config
+config/config.json
