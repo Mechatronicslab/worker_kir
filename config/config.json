@@ -6,18 +6,9 @@
     "database": {
         "development": {
             "uri": "mongodb://tester:12345@192.168.43.244:27017/kirDB"
-        },
-        "production": {
-            "uri": "mongodb://kirDB:DBkirzxc123@dbmongo.server.pptik.id:27017/kirDB"
         }
-    },
-    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@rmq2.pptik.id:5672//kir_tanggamus?heartbeat=60",
-    "connection": {
-        "host" : "127.0.0.1",
-        "user" : "your_database_user",
-        "password" : "your_database_password",
-        "database" : "myapp_test"
-      }
+    }
+    
 
 
 }
