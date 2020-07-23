@@ -6,9 +6,13 @@
     "database": {
         "development": {
             "uri": "mongodb://tester:12345@192.168.43.244:27017/kirDB"
+        },
+        "production": {
+            "uri": "mongodb://xxx:xxxx@xxx.xxx.xxx.xx:xxxx/xxxx"
         }
-    }
-    
+    },
+    "rmqUri" : "amqp://xxx:xxx@xxx.xxx.xx:xx//xxx?xxx=60"
+
 
 
 }
