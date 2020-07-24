@@ -5,14 +5,14 @@
     "secret" : "kirtanggamus",
     "database": {
         "development": {
-            "uri": "mongodb://xxx:12345@192.168.43.244:27017/kirDB"
+            "uri": "mongodb://tester:12345@192.168.43.244:27017/kirDB"
         },
         "production": {
-            "uri": "mongodb://xxx:xxx@xxxx.xxxx.xxx.xxx:27017/xxx"
+            "uri": "mongodb://kirDB:DBkirzxc123@dbmongo.server.pptik.id:27017/kirDB"
         }
     },
-    "rmqUri" : "amqp://xxx:xxxx@xxx.xxx.xxx:xxxx//xxxxx?xxxx=60"
-
+    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@rmq2.pptik.id:5672//kir_tanggamus?heartbeat=60",
+  
 
 
 }
