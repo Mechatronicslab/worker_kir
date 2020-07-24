@@ -11,7 +11,7 @@
             "uri": "mongodb://kirDB:DBkirzxc123@dbmongo.server.pptik.id:27017/kirDB"
         }
     },
-    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@rmq2.pptik.id:5672//kir_tanggamus?heartbeat=60",
+    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@rmq2.pptik.id:5672//kir_tanggamus?heartbeat=60"
   
 
 
