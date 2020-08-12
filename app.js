@@ -216,7 +216,7 @@ storeMysql = (data) => {
           .database("fotomentah")
           .insert({
             nouji: value.nouji,
-            fotodepanmentah: fs.readFileSync(baseDir + fotodepanmentah),
+            fotodepanmentah: fs.readFileSync(baseDir + fotodepan),
             fotobelakangmentah: fs.readFileSync(
               baseDir + fotobelakang
             ),
