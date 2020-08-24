@@ -52,7 +52,7 @@ async function onListening() {
           console.log("RMQ connected");
           let channel = await rmq.createChannel();
           try {
-            await channel.consume("kir", async (msg) => {
+            await channel.consume("kir_test", async (msg) => {
               console.log("=================================================");
               let data = JSON.parse(msg.content.toString());
               let pengujian = data.pengujian;
@@ -73,7 +73,7 @@ async function onListening() {
               // console.log(data);
               await createData(data);
 
-              channel.ack(msg);
+              // channel.ack(msg);
             });
           } catch (err) {
             // return channel;
@@ -171,15 +171,12 @@ createData = (data) => {
 
 storeMysql = (data) => {
   return new Promise(async (resolve, reject) => {
+
     let value = Object.assign(data.pengujian, data.kendaraan);
-    // value.tglsertifikatreg = value     .tglsertifikatreg     .replace("-", "");
     let tgluji = new Date(value.tgluji);
     let tglsertifikatreg = new Date(value.tglsertifikatreg);
     let masaberlakuuji = new Date(value.masaberlakuuji);
-    console.log(tgluji)
-    console.log(value.tglsertifikatreg)
-    console.log(masaberlakuuji)
-    value.tgluji = dateFormat(tgluji,"mmddyyyy")
+    value.tgluji = dateFormat(tgluji,"ddmmyyyy")
     value.tglsertifikatreg = dateFormat(tglsertifikatreg,"ddmmyyyy")
     value.masaberlakuuji = dateFormat(masaberlakuuji,"ddmmyyyy")
     value.idpetugasuji = 651;
