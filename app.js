@@ -73,7 +73,7 @@ async function onListening() {
               // console.log(data);
               await createData(data);
 
-              // channel.ack(msg);
+              channel.ack(msg);
             });
           } catch (err) {
             // return channel;
@@ -149,6 +149,7 @@ createData = (data) => {
         });
       await storeMysql(data)
         .then(async (result) => {
+          // console.log("selesai")
           dataUji
             .deleteOne({ nouji: data.kendaraan.nouji })
             .then(async (result) => {
