@@ -52,7 +52,7 @@ async function onListening() {
           console.log("RMQ connected");
           let channel = await rmq.createChannel();
           try {
-            await channel.consume("kir_test", async (msg) => {
+            await channel.consume("kir", async (msg) => {
               console.log("=================================================");
               let data = JSON.parse(msg.content.toString());
               let pengujian = data.pengujian;
