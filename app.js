@@ -15,7 +15,7 @@ const RawKir = require("./model/Raw");
 const Kendaraan = require("./model/Kendaraan");
 const Pengujian = require("./model/Pengujian");
 const dataUji = require("./model/datauji");
-const baseDir = "static/";
+const baseDir = "/static/";
 const sharp = require("sharp");
 const dateFormat = require('dateformat');
 app.use(
@@ -149,7 +149,7 @@ createData = (data) => {
         });
       await storeMysql(data)
         .then(async (result) => {
-          // console.log("selesai")
+          console.log("selesai")
           dataUji
             .deleteOne({ nouji: data.kendaraan.nouji })
             .then(async (result) => {
