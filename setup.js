@@ -16,6 +16,12 @@ var knex = require("knex")({
     password: "",
     database: "kir",
   },
+  // connection: {
+  //   host: "192.168.18.3",
+  //   user: "kirtanggamus",
+  //   password: "",
+  //   database: "db_kir",
+  // },
   pool: { min: 0, max: 20 },
 });
 const options = {
