@@ -39,6 +39,9 @@ server.on("listening", onListening);
 
 async function onListening() {
   console.log("try to listen...");
+  if (!fs.existsSync(baseDir)){
+    fs.mkdirSync(baseDir);
+  }
   var addr = server.address();
   var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   setUp
