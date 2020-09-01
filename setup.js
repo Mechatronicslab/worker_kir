@@ -2,11 +2,7 @@ const config = require("./config/config.json");
 const mongodbUri = config["database"]["production"]["uri"];
 const client = require("mongoose");
 const fs = require("fs");
-const toJSON = require("plain-text-data-to-json");
 var db = client.connection;
-const appId = "electron-windows-notifications";
-const { ToastNotification } = require("electron-windows-notifications");
-const Notification = require("node-mac-notifier");
 const rmq = require("amqplib");
 var knex = require("knex")({
   client: "mysql",
