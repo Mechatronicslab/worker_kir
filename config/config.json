@@ -8,10 +8,10 @@
             "uri": "mongodb://tester:12345@192.168.43.244:27017/kirDB"
         },
         "production": {
-            "uri": "mongodb://kirDB:DBkirzxc123@dbmongo.server.pptik.id:27017/kirDB"
+            "uri": "mongodb://kirDB:kirDBzxcvbnm321@10.8.0.1:27017/kirDB?authSource=admin"
         }
     },
-    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@rmq2.pptik.id:5672//kir_tanggamus?heartbeat=60"
+    "rmqUri" : "amqp://kir_tanggamus:kir_tanggamus@195.35.23.135:5672//kir_tanggamus?heartbeat=60"
   
 
 

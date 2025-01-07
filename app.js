@@ -18,6 +18,8 @@ const dataUji = require("./model/datauji");
 const baseDir = "static/";
 const sharp = require("sharp");
 const dateFormat = require('dateformat');
+const axios = require('axios');
+const url = "http://kir-tanggamus-api.psti-ubl.id/static/"
 app.use(
   bodyParser.urlencoded({
     enableTypes: ["json", "form"],
@@ -39,7 +41,7 @@ server.on("listening", onListening);
 
 async function onListening() {
   console.log("try to listen...");
-  if (!fs.existsSync(baseDir)){
+  if (!fs.existsSync(baseDir)) {
     fs.mkdirSync(baseDir);
   }
   var addr = server.address();
@@ -60,19 +62,20 @@ async function onListening() {
               let data = JSON.parse(msg.content.toString());
               let pengujian = data.pengujian;
               let kendaraan = data.kendaraan;
-              await decodeImg(pengujian.fotodepansmallfile, pengujian.fotodepansmall);
-              await decodeImg(
-                pengujian.fotobelakangsmallfile,
-                pengujian.fotobelakangsmall
-              );
-              await decodeImg(pengujian.fotokirismallfile, pengujian.fotokirismall);
-              await decodeImg(pengujian.fotokanansmallfile, pengujian.fotokanansmall);
+              // await decodeImg(pengujian.fotodepansmallfile, pengujian.fotodepansmall);
+              // await decodeImg(
+              //   pengujian.fotobelakangsmallfile,
+              //   pengujian.fotobelakangsmall
+              // );
+              // await decodeImg(pengujian.fotokirismallfile, pengujian.fotokirismall);
+              // await decodeImg(pengujian.fotokanansmallfile, pengujian.fotokanansmall);
               delete pengujian._id;
               delete pengujian.__v;
               delete pengujian.fotodepansmallfile;
               delete pengujian.fotobelakangsmallfile;
               delete pengujian.fotokirismallfile;
               delete pengujian.fotokanansmallfile;
+              delete pengujian.denda ;
               // console.log(data);
               await createData(data);
 
@@ -101,7 +104,7 @@ function decodeImg(img, filename) {
     const buff = new Buffer.from(img, "base64");
     sharp(buff)
       .resize(600, 600)
-      .toFile(baseDir+filename, (err, info) => {
+      .toFile(baseDir + filename, (err, info) => {
         if (err) {
           console.log(err);
         } else {
@@ -110,13 +113,17 @@ function decodeImg(img, filename) {
       });
   } catch (err) {
     console.log(err);
-    onListening();
+    // onListening();
   }
 }
 
 createData = (data) => {
   return new Promise(async (resolve, reject) => {
+    // console.log(data.pengujian.tgluji)
+    // console.log(data.pengujian.masaberlakuuji)
     try {
+
+
       await RawKir.create(data)
         .then((result) => {
           console.log("insert Data Raw Success");
@@ -152,19 +159,20 @@ createData = (data) => {
         });
       await storeMysql(data)
         .then(async (result) => {
-          // console.log("selesai")
-          dataUji
-            .deleteOne({ nouji: data.kendaraan.nouji })
-            .then(async (result) => {
-              console.log("Proses selesai");
-            })
-            .catch((err) => {
-              console.log("gagal Hapus data :" + err);
-            });
+          console.log("selesai")
+          // dataUji
+          //   .deleteOne({ nouji: data.kendaraan.nouji })
+          //   .then(async (result) => {
+          //     console.log("Proses selesai");
+          //   })
+          //   .catch((err) => {
+          //     console.log("gagal Hapus data :" + err);
+          //   });
         })
         .catch((err) => {
           console.log("gagal input data kendaraan :" + err);
         });
+
       resolve(true);
     } catch (error) {
       console.log("error insert history" + error);
@@ -180,20 +188,20 @@ storeMysql = (data) => {
     let tgluji = new Date(value.tgluji);
     let tglsertifikatreg = new Date(value.tglsertifikatreg);
     let masaberlakuuji = new Date(value.masaberlakuuji);
-    value.tgluji = dateFormat(tgluji,"ddmmyyyy")
-    value.tglsertifikatreg = dateFormat(tglsertifikatreg,"ddmmyyyy")
-    value.masaberlakuuji = dateFormat(masaberlakuuji,"ddmmyyyy")
+    value.tgluji = dateFormat(tgluji, "ddmmyyyy")
+    value.tglsertifikatreg = dateFormat(tglsertifikatreg, "ddmmyyyy")
+    value.masaberlakuuji = dateFormat(masaberlakuuji, "ddmmyyyy")
     value.idpetugasuji = 651;
-    value.idkepaladinas = 200;
-    value.iddirektur = 17;
+    value.idkepaladinas = 687;
+    value.iddirektur = 19;
     let fotodepan = value.fotodepansmall
     let fotobelakang = value.fotobelakangsmall
     let fotokanan = value.fotokanansmall
     let fotokiri = value.fotokirismall
-    value.fotodepansmall = null ;
-    value.fotobelakangsmall = null ;
-    value.fotokanansmall = null ;
-    value.fotokirismall = null ;
+    value.fotodepansmall = null;
+    value.fotobelakangsmall = null;
+    value.fotokanansmall = null;
+    value.fotokirismall = null;
 
     // value.tglsertifikatreg = 20200713; value.tgluji = 20200713;
     delete value.bahankaroseri;
@@ -211,7 +219,32 @@ storeMysql = (data) => {
     delete value.deleted;
     delete value.no_surat_numpanguji;
     delete value.no_surat_ket_mutasi;
+    delete value.tglsurat;
     console.log(value);
+
+    await axios.get(url + fotodepan, { responseType: 'arraybuffer' })
+      .then(res => {
+        let data = Buffer.from(res.data, 'binary').toString('base64')
+        decodeImg(data, fotodepan)
+      })
+
+    await axios.get(url + fotobelakang, { responseType: 'arraybuffer' })
+      .then(res => {
+        let data = Buffer.from(res.data, 'binary').toString('base64')
+        decodeImg(data, fotobelakang)
+      })
+
+    await axios.get(url + fotokanan, { responseType: 'arraybuffer' })
+      .then(res => {
+        let data = Buffer.from(res.data, 'binary').toString('base64')
+        decodeImg(data, fotokanan)
+      })
+
+    await axios.get(url + fotokiri, { responseType: 'arraybuffer' })
+      .then(res => {
+        let data = Buffer.from(res.data, 'binary').toString('base64')
+        decodeImg(data, fotokiri)
+      })
     app
       .database("datapengujian")
       .insert(value)
@@ -229,6 +262,14 @@ storeMysql = (data) => {
           })
           .then(() => {
             console.log("Data Berhasil tersimpan");
+            try {
+              fs.unlinkSync(baseDir + fotodepan)
+              fs.unlinkSync(baseDir + fotobelakang)
+              fs.unlinkSync(baseDir + fotokanan)
+              fs.unlinkSync(baseDir + fotokiri)
+            } catch (err) {
+              console.error(err)
+            }
             resolve(true);
           })
           .catch((err) => {

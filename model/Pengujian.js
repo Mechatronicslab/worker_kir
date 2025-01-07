@@ -68,7 +68,8 @@ const pengujian = new Schema({
       default: new Date().toISOString()
   },
   idAdministrasi: ObjectId,
-  total: Number
+  total: Number,
+  denda : Number
 });
 
 module.exports = mongoose.model("pengujian", pengujian);

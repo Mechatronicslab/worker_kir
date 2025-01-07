@@ -7,9 +7,9 @@ const rmq = require("amqplib");
 var knex = require("knex")({
   client: "mysql",
   connection: {
-    host: "sql.server.pptik.id",
-    user: "kir",
-    password: "",
+    host: "10.8.0.1",
+    user: "adminPSTIsql",
+    password: "PSTIadminSQL93jfxjsZUyQwerty123",
     database: "kir",
   },
   // connection: {
